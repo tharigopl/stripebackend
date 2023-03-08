@@ -1,0 +1,39 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no')
+    meta(name='twitter:card', content='summary')
+    meta(name='twitter:site', content='@stripe')
+    meta(name='twitter:title', content='MomPop Gifts')
+    meta(name='twitter:description', content='MomPop Gifts is an on-demand platform built on top of Stripe Connect.')
+    meta(name='twitter:image', content='https://rocketrides.io/images/rocketrides.png')
+    title MomPop Gifts
+    link(rel='stylesheet', type='text/css', href='/stylesheets/rocketrides.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Barlow:500,600')
+    link(rel='icon', type='image/png', sizes='64x64', href='/images/favicon.png')
+
+  body
+    header
+      #top
+        if host
+          .logo
+            a.rocketrides.mark(href='/')
+          .links
+            if host.stripeAccountId && host.onboardingComplete
+              a(href='/hosts/dashboard') Dashboard
+            a(href='/hosts/logout') Log out
+        else
+          .logo
+            a.rocketrides(href='/')
+          .links
+            a(href='/hosts/login') Log in
+      block header
+
+    #content
+      block content
+
+    footer
+      block footer
+
+    script(src='/javascripts/mompopgifts.js')
