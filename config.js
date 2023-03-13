@@ -23,7 +23,9 @@ module.exports = {
   },
 
   // Configuration for MongoDB
-  mongoUri: 'mongodb+srv://tharigopla:Tharigopla123@cluster0.34y8vqt.mongodb.net/test',
+  //Mongo cloud
+  //mongoUri: 'mongodb+srv://tharigopla:Tharigopla123@cluster0.34y8vqt.mongodb.net/test',
+  mongoUri: 'mongodb://localhost:27017/',
 
   // Configuration for Google Cloud (only useful if you want to deploy to GCP)
   gcloud: {

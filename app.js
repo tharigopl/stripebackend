@@ -72,6 +72,9 @@ app.locals.moment = moment;
 //app.use('/hosts/stripe', require('./routes/hosts/stripe'));
 app.use('/hosts', require('./routes/hosts/hosts'));
 app.use('/hosts/stripe', require('./routes/hosts/stripe'));
+app.use('/hosts/updatedstripe', require('./routes/hosts/updatedstripe'));
+//app.use('/users', require('./routes/users/users'));
+//app.use('/users/stripe', require('./routes/users/stripe'));
 
 // API routes for gifts and guests used by the mobile app
 app.use('/api/settings', require('./routes/api/settings'));

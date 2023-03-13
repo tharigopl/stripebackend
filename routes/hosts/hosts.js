@@ -41,7 +41,8 @@ const getCurrencySymbol = currency => {
 router.get('/dashboard', hostRequired, async (req, res) => {
   const host = req.user;
   // Retrieve the balance from Stripe
-  console.log("Stripe id", host.stripeAccountId);
+  console.log("Stripe id req.user", req.user);
+  console.log("Stripe id 1", host.stripeAccountId);
   const balance = await stripe.balance.retrieve({
     stripeAccount: host.stripeAccountId,
   });
@@ -179,11 +180,15 @@ router.post('/signup', async (req, res, next) => {
 
   // Check if we have a logged-in host
   let host = req.user;
+  console.log("req.user", req.user);
   if (!host) {
     try {
       // Try to create and save a new host
+      console.log("Host value in body /signup", body);
       host = new Host(body);
       host = await host.save()
+
+      console.log("Host value in hosts.js /signup", host);
       // Sign in and redirect to continue the signup process
       req.logIn(host, err => {
         if (err) next(err);
@@ -200,12 +205,109 @@ router.post('/signup', async (req, res, next) => {
     try {
       // Try to update the logged-in host using the newly entered profile data
       host.set(body);
+      console.log("Host value in body 1 /signup", body);
       await host.save();
       return res.redirect('/hosts/stripe/authorize');
     } catch (err) {
       next(err);
     }
   }
+});
+
+/**
+ * POST /hosts/signup
+ *
+ * Create a user and update profile information during the host onboarding process.
+ */
+router.post('/usignup', async (req, res, next) => {
+  const body = Object.assign({}, req.body, {
+    // Use `type` instead of `host-type` for saving to the DB.
+    type: req.body['host-type'],
+    'host-type': undefined,
+  });
+
+  // Check if we have a logged-in host
+  let host = req.user;
+  console.log("req.user", req.user);
+  console.log("host", host);
+  if (typeof host === "undefined") {
+    try {
+      // Try to create and save a new host
+      console.log("usignup Host value in body 111 /usignup", body);
+      host = new Host(body);
+      host = await host.save()
+
+      console.log("usignup Host value in hosts.js 111 /usignup", host);
+      return res.redirect('/hosts/updatedstripe/authorize');
+      // Sign in and redirect to continue the signup process
+      req.logIn(host, err => {
+        if (err) next(err);
+        return res.redirect('/hosts/usignup');
+      });
+    } catch (err) {
+      console.log(err); 
+      // Show an error message to the user
+      const errors = Object.keys(err.errors).map(field => err.errors[field].message);
+      res.render('signup', { step: 'account', error: errors[0] });
+    }
+  } 
+  else {
+    try {
+      // Try to update the logged-in host using the newly entered profile data
+      host.set(body);
+      console.log("ustripe Host value in body 333 /usignup", body);
+      await host.save();
+      return res.redirect('/hosts/updatedstripe/authorize');
+    } catch (err) {
+      next(err);
+    }
+  }
+});
+
+/**
+ * GET /hosts/udashboard
+ *
+ * Show the Dashboard for the logged-in host with the overview,
+ * their gift history, and the ability to simulate a test gift.
+ *
+ * Use the `hostRequired` middleware to ensure that only logged-in
+ * hosts can access this route.
+ */
+router.get('/udashboard', async (req, res) => {
+  const host = req.user;
+  // Retrieve the balance from Stripe
+  console.log("Stripe id req.user", req.user);
+  console.log("Stripe id 1", host.stripeAccountId);
+  const balance = await stripe.balance.retrieve({
+    stripeAccount: host.stripeAccountId,
+  });
+  // Fetch the host's recent gifts
+  const gifts = await host.listRecentGifts();
+  const giftsTotalAmount = gifts.reduce((a, b) => {
+    return a + b.amountForHost();
+  }, 0);
+  // const [showBanner] = req.flash('showBanner');
+  // There is one balance for each currencies used: as this 
+  // demo app only uses USD we'll just use the first object
+  /* res.render('dashboard', {
+    host: host,
+    balanceAvailable: balance.available[0].amount,
+    balancePending: balance.pending[0].amount,
+    giftsTotalAmount: giftsTotalAmount,
+    balanceCurrency: getCurrencySymbol(balance.available[0].currency),
+    gifts: gifts,
+    showBanner: !!showBanner || req.query.showBanner,
+  }); */
+
+  res.json(
+    {
+      host: host,
+      balanceAvailable: balance.available[0].amount,
+      balancePending: balance.pending[0].amount,
+      giftsTotalAmount: giftsTotalAmount,
+      balanceCurrency: getCurrencySymbol(balance.available[0].currency),
+      gifts: gifts,
+    });
 });
 
 /**

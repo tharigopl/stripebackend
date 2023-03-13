@@ -22,13 +22,14 @@ function hostRequired(req, res, next) {
  *
  * Redirect to Stripe to set up payments.
  */
-router.get('/authorize', hostRequired, async (req, res, next) => {
+router.get('/authorize', async (req, res, next) => {
   // Generate a random string as `state` to protect from CSRF and include it in the session
   req.session.state = Math.random()
     .toString(36)
     .slice(2);
 
   try {
+    console.log("updatedStripe /authorize request user", req.user);
     let accountId = req.user.stripeAccountId;
 
     // Create a Stripe account for this user if one does not exist already
@@ -57,7 +58,7 @@ router.get('/authorize', hostRequired, async (req, res, next) => {
           }
         });
       }
-      console.log("Account Params in stripe.js ", accountParams);
+      console.log("Account Params in updatedstripe.js ", accountParams);
       const account = await stripe.accounts.create(accountParams);
       accountId = account.id;
 
@@ -71,8 +72,8 @@ router.get('/authorize', hostRequired, async (req, res, next) => {
     // Create an account link for the user's Stripe account
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: config.publicDomain + '/hosts/stripe/authorize',
-      return_url: config.publicDomain + '/hosts/stripe/onboarded',
+      refresh_url: config.publicDomain + '/hosts/updatedstripe/authorize',
+      return_url: config.publicDomain + '/hosts/updatedstripe/onboarded',
       type: 'account_onboarding'
     });
 
@@ -117,17 +118,17 @@ router.get('/onboarded', hostRequired, async (req, res, next) => {
  *
  * Redirect to the hosts' Stripe Express dashboard to view payouts and edit account details.
  */
-router.get('/dashboard', hostRequired, async (req, res) => {
+router.get('/udashboard', hostRequired, async (req, res) => {
   const host = req.user;
   // Make sure the logged-in host completed the Express onboarding
   if (!host.onboardingComplete) {
-    return res.redirect('/hosts/signup');
+    return res.redirect('/hosts/usignup');
   }
   try {
     // Generate a unique login link for the associated Stripe account to access their Express dashboard
     const loginLink = await stripe.accounts.createLoginLink(
       host.stripeAccountId, {
-        redirect_url: config.publicDomain + '/hosts/dashboard'
+        redirect_url: config.publicDomain + '/hosts/udashboard'
       }
     );
     // Directly link to the account tab
@@ -139,7 +140,7 @@ router.get('/dashboard', hostRequired, async (req, res) => {
   } catch (err) {
     console.log(err);
     console.log('Failed to create a Stripe login link.');
-    return res.redirect('/hosts/signup');
+    return res.redirect('/hosts/usignup');
   }
 });
 
