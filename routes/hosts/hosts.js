@@ -1,8 +1,8 @@
 'use strict';
 
 const config = require('../../config');
-const stripe = require('stripe')(config.stripe.secretKey, {
-  apiVersion: config.stripe.apiVersion || '2022-08-01'
+const stripe = require('stripe')(process.env.STRIPE_SECRETKEY, {
+  apiVersion: process.env.STRIPE_API_VERSION || '2022-08-01'
 });
 const express = require('express');
 const router = express.Router();
@@ -148,6 +148,7 @@ router.post('/gifts', hostRequired, async (req, res, next) => {
  * Display the signup form on the right step depending on the current completion.
  */
 router.get('/signup', (req, res) => {
+  console.log("Signup added in Rockets");
   let step = 'account';
   // Naive way to identify which step we're on: check for the presence of user profile data
   if (req.user) {
@@ -184,15 +185,12 @@ router.post('/signup', async (req, res, next) => {
   if (!host) {
     try {
       // Try to create and save a new host
-      console.log("Host value in body /signup", body);
-      host = new Host(body);
+      host = new host(body);
       host = await host.save()
-
-      console.log("Host value in hosts.js /signup", host);
       // Sign in and redirect to continue the signup process
       req.logIn(host, err => {
         if (err) next(err);
-        return res.redirect('/hosts/signup');
+        return res.redirect('/hosts/usignup');
       });
     } catch (err) {
       console.log(err); 
@@ -205,13 +203,43 @@ router.post('/signup', async (req, res, next) => {
     try {
       // Try to update the logged-in host using the newly entered profile data
       host.set(body);
-      console.log("Host value in body 1 /signup", body);
       await host.save();
-      return res.redirect('/hosts/stripe/authorize');
+      return res.redirect('/hosts/updatedstripe/authorize');
     } catch (err) {
       next(err);
     }
   }
+  // if (!host) {
+  //   try {
+  //     // Try to create and save a new host
+  //     console.log("Host value in body /signup", body);
+  //     host = new Host(body);
+  //     host = await host.save()
+
+  //     console.log("Host value in hosts.js /signup", host);
+  //     // Sign in and redirect to continue the signup process
+  //     req.logIn(host, err => {
+  //       if (err) next(err);
+  //       return res.redirect('/hosts/signup');
+  //     });
+  //   } catch (err) {
+  //     console.log(err); 
+  //     // Show an error message to the user
+  //     const errors = Object.keys(err.errors).map(field => err.errors[field].message);
+  //     res.render('signup', { step: 'account', error: errors[0] });
+  //   }
+  // } 
+  // else {
+  //   try {
+  //     // Try to update the logged-in host using the newly entered profile data
+  //     host.set(body);
+  //     console.log("Host value in body 1 /signup", body);
+  //     await host.save();
+  //     return res.redirect('/hosts/stripe/authorize');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
 });
 
 /**
@@ -230,15 +258,12 @@ router.post('/usignup', async (req, res, next) => {
   let host = req.user;
   console.log("req.user", req.user);
   console.log("host", host);
+
   if (typeof host === "undefined") {
     try {
       // Try to create and save a new host
-      console.log("usignup Host value in body 111 /usignup", body);
       host = new Host(body);
       host = await host.save()
-
-      console.log("usignup Host value in hosts.js 111 /usignup", host);
-      return res.redirect('/hosts/updatedstripe/authorize');
       // Sign in and redirect to continue the signup process
       req.logIn(host, err => {
         if (err) next(err);
@@ -255,13 +280,52 @@ router.post('/usignup', async (req, res, next) => {
     try {
       // Try to update the logged-in host using the newly entered profile data
       host.set(body);
-      console.log("ustripe Host value in body 333 /usignup", body);
       await host.save();
       return res.redirect('/hosts/updatedstripe/authorize');
     } catch (err) {
       next(err);
     }
   }
+
+  // if (typeof host === "undefined") {
+  //   try {
+  //     // Try to create and save a new host
+  //     console.log("usignup Host value in body 111 /usignup", body);
+  //     host = new Host(body);
+  //     host = await host.save()
+
+  //     // req.logIn(host, err => {
+  //     //   if (err) next(err);
+  //     //   return res.redirect('/hosts/usignup');
+  //     // });
+
+      
+  //     // Sign in and redirect to continue the signup process
+  //     // req.logIn(host, err => {
+  //     //   if (err) next(err);
+  //     //   return res.redirect('/hosts/usignup');
+  //     // });
+  //     // console.log("usignup Host value in hosts.js 111 /usignup", host);
+      
+  //     // return res.redirect('/hosts/updatedstripe/authorize');
+  //   } catch (err) {
+  //     console.log(err); 
+  //     // Show an error message to the user
+  //     const errors = Object.keys(err.errors).map(field => err.errors[field].message);
+  //     res.render('signup', { step: 'account', error: errors[0] });
+  //   }
+  // } 
+  // else {
+  //   try {
+  //     // Try to update the logged-in host using the newly entered profile data
+  //     host.set(body);
+  //     console.log("ustripe Host value in body 333 /usignup", body);
+  //     await host.save();
+  //     return next('/hosts/updatedstripe/authorize');
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
 });
 
 /**

@@ -1,8 +1,8 @@
 'use strict';
 
 const config = require('../../config');
-const stripe = require('stripe')(config.stripe.secretKey, {
-  apiVersion: config.stripe.apiVersion || '2022-08-01'
+const stripe = require('stripe')(process.env.STRIPE_SECRETKEY, {
+  apiVersion: process.env.STRIPE_API_VERSION || '2022-08-01'
 });
 const express = require('express');
 const router = express.Router();

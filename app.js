@@ -17,7 +17,9 @@ app.set('trust proxy', true);
 // MongoDB configuration
 const mongoose = require('mongoose');
 const connectRetry = function() {
-  mongoose.connect(config.mongoUri, {
+  console.log("Token ", process.env.DB_NAME);
+  const mongouri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.34y8vqt.mongodb.net/${process.env.DB_NAME}`;
+  mongoose.connect(mongouri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,

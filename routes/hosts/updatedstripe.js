@@ -1,8 +1,8 @@
 'use strict';
 
 const config = require('../../config');
-const stripe = require('stripe')(config.stripe.secretKey, {
-  apiVersion: config.stripe.apiVersion || '2022-08-01'
+const stripe = require('stripe')(process.env.STRIPE_SECRETKEY, {
+  apiVersion: process.env.STRIPE_API_VERSION || '2022-08-01'
 });
 //const request = require('request-promise-native');
 const querystring = require('querystring');
@@ -17,20 +17,21 @@ function hostRequired(req, res, next) {
   next();
 }
 
-/**
- * GET /hosts/stripe/authorize
+/**-
+ * GEwT /hosts/stripe/authorize
  *
  * Redirect to Stripe to set up payments.
  */
 router.get('/authorize', async (req, res, next) => {
+  console.log("updatedStripe /authorize request user", req.user);
   // Generate a random string as `state` to protect from CSRF and include it in the session
   req.session.state = Math.random()
     .toString(36)
     .slice(2);
 
   try {
-    console.log("updatedStripe /authorize request user", req.user);
-    let accountId = req.user.stripeAccountId;
+    console.log("updatedStripe /authorize request user");
+    let accountId = req.stripeAccountId;
 
     // Create a Stripe account for this user if one does not exist already
     if (accountId == undefined) {

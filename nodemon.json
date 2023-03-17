@@ -1,0 +1,10 @@
+{
+    "env":{
+        "DB_USER": "tharigopla",
+        "DB_PASSWORD" : "Tharigopla123",
+        "DB_NAME" : "test",
+        "STRIPE_SECRETKEY" : "sk_test_51MfwOdIG1pb0YbjaRmbi6me1FuzawPzUfSC3KXuqFMt2NhpHyHIb5Z2VxCUf0trxixFt1D1Viu2q3wNvzhxpylGG00f8wQbXwt",
+        "STRIPE_PUBLISHABLEKEY" : "pk_test_51MfwOdIG1pb0YbjaCLWZMdycVQH2T9qAxPor8ZbqMNg1MBKwYYlWCwtjdozSqCOfT2yTfULEIgDy3khfCqp07NcT0058OOSqK6",
+        "STRIPE_API_VERSION" : "2022-11-15"
+    }
+}
